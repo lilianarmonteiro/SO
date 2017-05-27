@@ -9,9 +9,9 @@
 #include <limits.h>
 #include "readln.h"
 
-int node(int id, char* cmd, char** arg, int qtArg){ 
+int inject(char* id, char* cmd, char** arg, int qtArg){ 
 
-	int x, y, z, nrCharLidos, nrIn, nrOut;
+	int x, y, z, nrCharLidos;
 
 	char comando[PIPE_BUF];
 	sprintf(comando, "./%s", cmd);
@@ -21,25 +21,9 @@ int node(int id, char* cmd, char** arg, int qtArg){
 
 	char buffer[PIPE_BUF];
 
-//--------------------------CRIAR PIPE com NOME
-
 	char pipeIn[11];
-	sprintf(pipeIn, "/tmp/pipeIn%d",id);
-
-	char pipeOut[11];
-	sprintf(pipeOut, "/tmp/pipeOut%d",id);
-
-	x = mkfifo(pipeIn,0666);
-	if(x<0){
-		printf("erro criar %s\n",pipeIn);
-		return -1;
-	}
-
-	x = mkfifo(pipeOut, 0666);
-	if(x < 0){
-		printf("erro criar %s\n",pipeIn);
-		return -1;
-	}
+	sprintf(pipeIn, "/tmp/pipeIn%s",id);
+	int in;
 
 //--------------------------CRIAR PIPE SEM NOME - "pai escreve"/filho lê conversação
 
@@ -61,19 +45,14 @@ int node(int id, char* cmd, char** arg, int qtArg){
 
 //--------------------------CRIAR FILHOS
 
-	x = fork(); // FILHO que lê do pipeIN e escreve no pipe sem nome PF
+	x = fork(); // FILHO que lê do stdIn e escreve no pipe sem nome PF
 
 	if(x==0){ 
 		close(pf[0]);
 		close(fp[0]);
 		close(fp[1]);
 		
-		nrIn = open(pipeIn, O_RDONLY);
-		if(nrIn<0){
-			printf("erro open %s\n",pipeIn);
-			return -1;
-		}
-		while((nrCharLidos = readln(nrIn, buffer, PIPE_BUF)) >0){
+		while((nrCharLidos = readln(0, buffer, PIPE_BUF)) >0){
 			write(pf[1], buffer, nrCharLidos);
     		memset(buffer, 0, nrCharLidos);
 		}
@@ -106,19 +85,19 @@ int node(int id, char* cmd, char** arg, int qtArg){
 			exit(0);
 		}
 		else{
-			z = fork(); // FILHO que lê do pipe sem nome FP e escreve para o pipeOUT
+			z = fork(); // FILHO que lê do pipe sem nome FP e escreve para o pipeIn do id
 			if(z==0){ 
 				close(fp[1]); 
 				close(pf[0]); 
 				close(pf[1]);
 
-				nrOut = open(pipeOut, O_WRONLY);
-				if(nrOut<0){
-					printf("erro open %s\n",pipeOut);
+				in = open(pipeIn, O_WRONLY);
+				if(in<0){
+					printf("erro open %s\n",pipeIn);
 					return -1;
 				}
 				while((nrCharLidos = readln(fp[0], buffer, PIPE_BUF)) >0){
-					write(nrOut, buffer, nrCharLidos);
+					write(in, buffer, nrCharLidos);
     				memset(buffer, 0, nrCharLidos);
 				}
 
@@ -144,7 +123,7 @@ int node(int id, char* cmd, char** arg, int qtArg){
 int main(int argc, char** argv){
 
 	if(argc<4){
-        printf("Número de argumentos de node inválido\n");
+        printf("Número de argumentos de inject inválido\n");
         return -1;
     }
 
@@ -155,7 +134,7 @@ int main(int argc, char** argv){
 		argumentos[i-3]=argv[i]; //tira executavel, id, comando
 	}
 
-	node(atoi(argv[1]), argv[2], argumentos, argc-3);
+	inject(argv[1], argv[2], argumentos, argc-3);
 
 	free(argumentos);
 

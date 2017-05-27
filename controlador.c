@@ -63,8 +63,8 @@ int cria(char* buf){
 
 	x = fork();
 	if(x==0){
-		//execv(Arg[0], Arg);
-		//printf("erro exec node\n");
+		execv(Arg[0], Arg);
+		printf("erro exec %s no controlador\n",Arg[0]);
 		exit(0);
 	}
 	else{
@@ -86,17 +86,23 @@ int main(){
 	}
 
 	while((charLidos = readln(filde, buffer, PIPE_BUF)) > 0){
-		write(1, buffer, charLidos); //APAGAR DPSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+		cria(buffer); //node, connect
+		memset(buffer,0,charLidos);
+	}
 
-		if(charLidos!=0){
-			while(buffer[i] != ' ') i++;
-		    strncpy(cmd, buffer, i);
-		}
+	int x = mkfifo("/tmp/pipeControlador",0666);
+	if(x<0){
+		printf("erro criar /tmp/pipeControlador\n");
+		return -1;
+	}
 
-		cria(buffer);
-		//if(strcmp(cmd,"disconnect")==0); //qq coisa
-		//if(strcmp(cmd,"inject")==0); //qq coisa
-
+	int pipe = open("/tmp/pipeControlador", O_RDONLY);
+	if(pipe<0){
+		printf("erro open /tmp/pipeControlador\n");
+		return -1;
+	}
+	while((charLidos = readln(pipe, buffer, PIPE_BUF)) >0){
+		cria(buffer); //outros comandos passados dps de definida a rede, ex: inject, disconnect
 		memset(buffer,0,charLidos);
 	}
 

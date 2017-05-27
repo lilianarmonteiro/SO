@@ -16,7 +16,7 @@ int fanout(char** argumentos, int qtArg){
 	int c;
 	
 	char pipeOut[11];	
-	sprintf(pipeOut, "/tmp/pipeOut%d",argumentos[0]);
+	sprintf(pipeOut, "/tmp/pipeOut%s",argumentos[0]);
 
 	f[0] = open(pipeOut, O_RDONLY, 0666);
 

@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include "readln.h"
 
+#include <stdio.h>
+
 int myConst(char *buf, int qt, char* value){
     int size = strlen(value);
 
