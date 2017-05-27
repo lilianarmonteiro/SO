@@ -1,13 +1,8 @@
 #include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <limits.h>
-#include "readln.h"
 
 int inject(char* id, char* cmd, char** arg, int qtArg){ 
 
@@ -30,7 +25,6 @@ int inject(char* id, char* cmd, char** arg, int qtArg){
 
 		argumentos[qtArg+1]=NULL;
 
-
 		in = open(pipeIn, O_WRONLY);
 		if(in<0){
 			printf("erro open %s\n",pipeIn);
@@ -39,7 +33,7 @@ int inject(char* id, char* cmd, char** arg, int qtArg){
 
 		dup2(in,1);
 			
-		execvp(cmd, argumentos);
+		execvp(cmd, argumentos); //cat input.txt , lê do ficheiro e escreve para o node
 		printf("erro exec\n");
 		exit(0);
 	}
