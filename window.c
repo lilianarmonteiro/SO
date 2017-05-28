@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -110,10 +111,9 @@ int main(int argc, char** argv){
         write(1, buf, qtWindow);
      	memset(buf, 0, qtWindow);
 
-        for(i=linhas-2; i>=1; i--){
+        for(i=linhas-2; i>=0; i--){
         	strcpy(arrayLinhas[i+1],arrayLinhas[i]);
-        }
-        strcpy(arrayLinhas[1],arrayLinhas[0]);    	
+        }  	
 		
         if(linhas-1 > linhasAntigas) linhasAntigas++;
 	}
