@@ -16,14 +16,39 @@ int myConst(char *buf, int qt, char* value){
 	return qt+1;
 }
 
-int mySpawn(char *buf, int qt, char *cmd, char **args){
-	int status, qtConst, x, r;
-	char str[256];
+int mySpawn(char *buf, int qt, char *cmd, char **args, int nrArgs){
+	int status, qtConst, x, r, i, k, m, n;
+	char str[256], tmp[256], c1[qt];
+	int linhas[nrArgs];
+	char argumentos[args];
+
+	for(i=0; i<nrArgs; i++){
+		linhas[i] = -1;
+	}
+
+	for(i=0; i<nrArgs; i++){
+		tmp = args[i];
+		if(tmp[0] == '$') linhas[i] = atoi(tmp[1]);
+		else argumentos[i] = tmp;
+	}
+
+	for(i=0; i<nrArgs; i++){
+		memset(c1,'\0',qt);
+		if(linhas[i] != -1){
+			for(k=1, m=0; k<linhas[i]; k++, m++){
+    			while(buf[m] != ':') m++;
+    		}
+    		n=m;
+    		while(buf[m] != ':' && buf[n] != '\n') m++;
+    		strncpy(c1, &buf[n], m-n);
+    		argumentos[i] = c1;
+		}
+	}
 
 	x = fork();
 
 	if(x==0){
-		//exec...
+		execv(cmd, argumentos);
 	}
 
 	else{
@@ -47,7 +72,7 @@ int main(int argv, char** argc){
 	}
 
 	while((qt=readln(0,buf,PIPE_BUF))>0){
-		qtSpawn = mySpawn(buf, qt, argc[1], &argc[2]);
+		qtSpawn = mySpawn(buf, qt, argc[1], &argc[2], argv-2);
     	write(1, buf, qtSpawn);
 	}
 	
