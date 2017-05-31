@@ -7,6 +7,7 @@
 #include <limits.h>
 #include <string.h>
 #include "readln.h"
+#include "node.h"
 
 #include <stdio.h>
 
@@ -44,7 +45,7 @@ char** buscarArg(char* buf){
 
     /* get the first token */
     token = strtok(aux, s);
-    sprintf(Arg[0], "./%s",token);
+    Arg[0] = token;
 
     i=1;
     while( token!=NULL ) 
@@ -67,9 +68,6 @@ int cria(char* buf){
 		printf("erro exec %s no controlador\n",Arg[0]);
 		exit(0);
 	}
-	else{
-		wait(NULL);
-	}
 
 	return 0;
 }
@@ -77,34 +75,27 @@ int cria(char* buf){
 int main(){
 	char buffer[PIPE_BUF];
 	char cmd[10];
-	int charLidos, i=0;
+	int charLidos, son, fildeCont;
 
-	int filde = open("controlador.txt", O_RDONLY, 0666);
-	if(filde<0){
+	fildeCont = open("controlador.txt", O_RDONLY, 0666);
+	if(fildeCont<0){
 		printf("erro open controlador.txt\n");
 		return -1;
 	}
 
-	while((charLidos = readln(filde, buffer, PIPE_BUF)) > 0){
+	//cria a REDE predefinida
+	while((charLidos = readln(fildeCont, buffer, PIPE_BUF)) > 0){
+		write(1,buffer,charLidos); //APAGAR DPSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
 		cria(buffer); //node, connect
 		memset(buffer,0,charLidos);
 	}
-
-	int x = mkfifo("/tmp/pipeControlador",0666);
-	if(x<0){
-		printf("erro criar /tmp/pipeControlador\n");
-		return -1;
-	}
-
-	int pipe = open("/tmp/pipeControlador", O_RDONLY);
-	if(pipe<0){
-		printf("erro open /tmp/pipeControlador\n");
-		return -1;
-	}
-	while((charLidos = readln(pipe, buffer, PIPE_BUF)) >0){
+	
+	//edita a REDE criada
+	while((charLidos = readln(0, buffer, PIPE_BUF)) >0){
+		write(1,buffer,charLidos); //APAGAR DPSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
 		cria(buffer); //outros comandos passados dps de definida a rede, ex: inject, disconnect
 		memset(buffer,0,charLidos);
 	}
-
+	
 	return 0;
 }

@@ -14,7 +14,8 @@ int node(int id, char* cmd, char** arg, int qtArg){
 	int x, y, z, nrCharLidos, nrIn, nrOut;
 
 	char comando[PIPE_BUF];
-	sprintf(comando, "./%s", cmd);
+	if(strcmp(cmd,"const")==0 || strcmp(cmd,"filter")==0 || strcmp(cmd,"window")==0 || strcmp(cmd,"spawn")==0) sprintf(comando, "./%s", cmd);
+	else strcpy(comando,cmd);
 	
 	char** argumentos = (char **) malloc((qtArg+1) * sizeof(char *)); //comando, argumentos do comando
 	int i;
@@ -67,18 +68,20 @@ int node(int id, char* cmd, char** arg, int qtArg){
 		close(pf[0]);
 		close(fp[0]);
 		close(fp[1]);
-		
-		nrIn = open(pipeIn, O_RDONLY);
+
+		nrIn = open(pipeIn, O_RDONLY, 0666);
 		if(nrIn<0){
 			printf("erro open %s\n",pipeIn);
 			return -1;
 		}
+		
 		while((nrCharLidos = readln(nrIn, buffer, PIPE_BUF)) >0){
 			write(pf[1], buffer, nrCharLidos);
     		memset(buffer, 0, nrCharLidos);
 		}
 
 		close(pf[1]);
+		close(nrIn);
 		exit(0);
 	}
 	else {
@@ -101,8 +104,8 @@ int node(int id, char* cmd, char** arg, int qtArg){
 			close(pf[0]); 
 			close(fp[1]);
 
-			execv(comando, argumentos);
-			printf("erro exec\n");
+			execvp(comando, argumentos);
+			printf("erro exec node %d\n", id);
 			exit(0);
 		}
 		else{
@@ -112,26 +115,28 @@ int node(int id, char* cmd, char** arg, int qtArg){
 				close(pf[0]); 
 				close(pf[1]);
 
-				nrOut = open(pipeOut, O_WRONLY);
+				nrOut = open(pipeOut, O_WRONLY, 0666);
 				if(nrOut<0){
 					printf("erro open %s\n",pipeOut);
 					return -1;
 				}
+
 				while((nrCharLidos = readln(fp[0], buffer, PIPE_BUF)) >0){
 					write(nrOut, buffer, nrCharLidos);
     				memset(buffer, 0, nrCharLidos);
 				}
 
 				close(fp[0]);
+				close(nrOut);
 				exit(0);
 			}
 			else {
 				//pai fecha todos os pipes sem nome
+				//nao pode esperar pelos filhos porque se nao fica preso no exec
 				close(pf[1]);
 				close(pf[0]);
 				close(fp[1]);
 				close(fp[0]);
-				wait(NULL);
 			}
 		}
 	}
