@@ -37,11 +37,6 @@ int inject(char* id, char* cmd, char** arg, int qtArg){
 		printf("erro exec\n");
 		exit(0);
 	}
-	else{
-		wait(NULL);
-	}
-	
-	free(argumentos);
 
 	return 0;
 }
