@@ -17,64 +17,78 @@ int myConst(char *buf, int qt, char* value){
 }
 
 int mySpawn(char *buf, int qt, char *cmd, char **args, int nrArgs){
-	int status, qtConst, x, r, i, k, m, n;
-	char str[256], tmp[256], c1[qt];
-	int linhas[nrArgs];
-	char argumentos[nrArgs];
 
-	for(i=0; i<nrArgs; i++){
-		linhas[i] = -1;
-	}
+	int r, x, i, a, j, status = 0, qtConst = 0, coluna=1, flag = 0;
+	char str[256];
 
-	for(i=0; i<nrArgs; i++){
-		tmp = args[i];
-		if(tmp[0] == '$') linhas[i] = atoi(tmp[1]);
-		else argumentos[i] = tmp;
-	}
 
-	for(i=0; i<nrArgs; i++){
-		memset(c1,'\0',qt);
-		if(linhas[i] != -1){
-			for(k=1, m=0; k<linhas[i]; k++, m++){
-    			while(buf[m] != ':') m++;
-    		}
-    		n=m;
-    		while(buf[m] != ':' && buf[n] != '\n') m++;
-    		strncpy(c1, &buf[n], m-n);
-    		argumentos[i] = c1;
-		}
+	printf("NÚMERO DE ARGS: %d\n", nrArgs);
+	for(i=0; i <nrArgs; i++){
+		printf("ARGUMENTO %d: %s\n", i, args[i]);
 	}
+	
 
 	x = fork();
 
-	if(x==0){
-		execv(cmd, argumentos);
+	if(x == 0){
+		for(i = 0; i < nrArgs && args[i] != '\0' && flag == 0; i++){
+			//printf("entreeeeeei %d vezes\n",i );
+			if(args[i][0] == 'a'){
+				a = atoi(&args[i][1]);
+
+				printf("COLUNA: %d\n",a);
+
+				for(j = 0; buf[j] != '\n' && flag == 0; j++){
+					if(buf[j] == ':') coluna++;
+					if(coluna == a){
+						args[i] = &buf[coluna];
+						flag = 1;
+					}
+				}
+				
+				for(i=0; i < nrArgs; i++)
+					printf("ARGUMENTO %d: %s\n",i, args[i]);
+			}
+		}
+		//execv(cmd, args);
+		exit(-1);
 	}
 
 	else{
-		wait(&r);
-		status = WEXITSTATUS(r);
-		sprintf(str, "%d", status);
+		wait(&r);//, &status, WUNTRACED);
+
+		sprintf(str, "%d", WEXITSTATUS(r));
 		qtConst = myConst(buf, qt, str);
 		return qtConst;
 	}
 
 	return 0;
+
+
 }
 
-int main(int argv, char** argc){
+int main(int argc, char** argv){
 	char buf[PIPE_BUF];
+	char** argumentos = (char **) malloc((argc-1) * sizeof(char *));
+	int i;
 	int qt, qtSpawn;
 
-	if(argv < 3){
+	if(argc < 3){
 		printf("Número de argumentos de spawn inválido\n");
         return -1;
 	}
 
+	
+
+	for(i=2; i<argc; i++){
+		argumentos[i-2]=argv[i]; //tira executavel + o comando
+	}
+
 	while((qt=readln(0,buf,PIPE_BUF))>0){
-		qtSpawn = mySpawn(buf, qt, argc[1], &argc[2], argv-2);
+		qtSpawn = mySpawn(buf, qt, argv[1], argumentos, argc-2);
     	write(1, buf, qtSpawn);
 	}
 	
 	return 0;
+
 }

@@ -19,6 +19,12 @@ int fanout(char** argumentos, int qtArg){
 	sprintf(pipeOut, "/tmp/pipeOut%s",argumentos[0]);
 
 	f[0] = open(pipeOut, O_RDONLY, 0666);
+	
+	char pipeIn[i][11];
+	for(i = 1; i < qtArg-1; i++){
+		sprintf(pipeIn[i], "/tmp/pipeIn%s", argumentos[i]);
+		f[i] = open(pipeIn, O_WRONLY,0666);
+	}
 
 	//FALTA MUDAR PARA "PIPE IN %d" DOS VARIOS ARGUMENTOS[i]
 
