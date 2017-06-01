@@ -20,7 +20,7 @@ int mySpawn(char *buf, int qt, char *cmd, char **args, int nrArgs){
 	int status, qtConst, x, r, i, k, m, n;
 	char str[256], tmp[256], c1[qt];
 	int linhas[nrArgs];
-	char argumentos[args];
+	char argumentos[nrArgs];
 
 	for(i=0; i<nrArgs; i++){
 		linhas[i] = -1;
