@@ -3,19 +3,9 @@
 #include <limits.h>
 #include <unistd.h>
 #include "readln.h"
+#include "addFimLinha.h"
 
 #include <stdio.h>
-
-int myConst(char *buf, int qt, char* value){
-    int size = strlen(value);
-
-    buf[qt-1] = ':';
-    strcpy(&buf[qt], value);
-    qt = qt+size;
-    buf[qt] = '\n';
-
-	return qt+1;
-}
 
 int main(int argc, char** argv){
 
@@ -28,10 +18,11 @@ int main(int argc, char** argv){
 	int qt, qtConst;
 
 	while((qt=readln(0,buf,PIPE_BUF))>0){
-		qtConst = myConst(buf, qt, argv[1]);
+		qtConst = addFimLinha(buf, qt, argv[1]);
     	write(1, buf, qtConst);
     	memset(buf, 0, qtConst);
 	}
 	
 	return 0;
 }
+

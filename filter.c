@@ -3,31 +3,9 @@
 #include <limits.h>
 #include <unistd.h>
 #include "readln.h"
+#include "procura.h"
 
 #include <stdio.h>
-
-char* procura(char* buf, int qt, char *coluna){
-	char aux[qt];
-	strcpy(aux,buf);
-
-    const char *s = ":";
-    char *token;
-
-    /* get the first token */
-    token = strtok(aux, s);
-
-    int i=1;
-    while( i<atoi(coluna) ) 
-    {
-       token = strtok(NULL, s);
-       i++;
-    }
-
-    char* aux2 = malloc(strlen(token)*sizeof(char));
-    strcpy(aux2,token);
-
-   	return aux2;
-}
 
 int myFilter(char *buf, int qt, char *coluna, char *operador, char *operando){
 
