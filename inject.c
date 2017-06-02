@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include "inject.h"
 
 int inject(char* id, char* cmd, char** arg, int qtArg){ 
 
@@ -11,7 +12,7 @@ int inject(char* id, char* cmd, char** arg, int qtArg){
 	char** argumentos = (char **) malloc((qtArg+1) * sizeof(char *)); //comando, argumentos do comando
 	int i;
 
-	char pipeIn[11];
+	char pipeIn[13];
 	sprintf(pipeIn, "/tmp/pipeIn%s",id);
 	int in;
 
@@ -25,22 +26,23 @@ int inject(char* id, char* cmd, char** arg, int qtArg){
 
 		argumentos[qtArg+1]=NULL;
 
-		in = open(pipeIn, O_WRONLY);
+		in = open(pipeIn, O_WRONLY, 0666);
 		if(in<0){
 			printf("erro open %s\n",pipeIn);
 			return -1;
 		}
+		printf("OPEN: %d\n",in );
 
 		dup2(in,1);
 			
 		execvp(cmd, argumentos); //cat input.txt , lê do ficheiro e escreve para o node
 		printf("erro exec\n");
-		exit(0);
+		exit(-1);
 	}
 
 	return 0;
 }
-
+/*
 int main(int argc, char** argv){
 
 	if(argc<4){
@@ -60,4 +62,4 @@ int main(int argc, char** argv){
 	free(argumentos);
 
 	return 0;
-}
+}*/

@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 	int qt, qtFilter;
 
 	while((qt=readln(0,buf,PIPE_BUF))>0){
-		qtFilter = myFilter(buf, qt, argv[1], argv[2], argv[3]);
+        qtFilter = myFilter(buf, qt, argv[1], argv[2], argv[3]);
     	if(qtFilter) write(1, buf, qt);
     	memset(buf, 0, qt);
 	}

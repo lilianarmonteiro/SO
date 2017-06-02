@@ -1,0 +1,1 @@
+int inject(char* id, char* cmd, char** arg, int qtArg);

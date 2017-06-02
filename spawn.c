@@ -3,13 +3,14 @@
 #include <limits.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/wait.h>
 #include "readln.h"
 #include "addFimLinha.h"
 #include "procura.h"
 
 int mySpawn(char *buf, int qt, char *cmd, char **args, int nrArgs){
 
-	int r, son, i, a, qtConst = 0;
+	int r, son, i, qtConst = 0;
 	char str[5];
 
 	for(i = 1; i < nrArgs; i++){

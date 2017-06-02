@@ -1,0 +1,1 @@
+int myConnect(char** argumentos, int qtArg);

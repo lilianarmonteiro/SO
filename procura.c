@@ -4,8 +4,10 @@
 #include <unistd.h>
 #include "procura.h"
 
+#include <stdio.h>
+
 char* procura(char* buf, int qt, char *coluna){
-	char aux[qt];
+  char aux[qt];
 	strcpy(aux,buf);
 
     const char *s = ":\n";
@@ -21,7 +23,7 @@ char* procura(char* buf, int qt, char *coluna){
        i++;
     }
 
-    char* aux2 = malloc(strlen(token)*sizeof(char));
+    char* aux2 = malloc(PIPE_BUF *sizeof(char));
     strcpy(aux2,token);
 
    	return aux2;

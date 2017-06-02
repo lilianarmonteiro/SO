@@ -8,17 +8,18 @@
 #include <sys/stat.h>
 #include <limits.h>
 #include "readln.h"
+#include "node.h"
 
 int node(int id, char* cmd, char** arg, int qtArg){ 
 
-	int x, y, z, nrCharLidos, nrIn, nrOut;
+	int i, x, y, z, nrCharLidos, nrIn, nrOut;
 
 	char comando[PIPE_BUF];
 	if(strcmp(cmd,"const")==0 || strcmp(cmd,"filter")==0 || strcmp(cmd,"window")==0 || strcmp(cmd,"spawn")==0) sprintf(comando, "./%s", cmd);
 	else strcpy(comando,cmd);
 	
-	char** argumentos = (char **) malloc((qtArg+1) * sizeof(char *)); //comando, argumentos do comando
-	int i;
+	char** argumentos = (char **) malloc((qtArg+2) * sizeof(char *)); //comando, argumentos do comando, null
+	for(i=0; i<qtArg+2; i++) argumentos[i] = (char*) malloc(PIPE_BUF * sizeof(char));
 
 	char buffer[PIPE_BUF];
 
@@ -81,19 +82,18 @@ int node(int id, char* cmd, char** arg, int qtArg){
 		}
 
 		close(pf[1]);
-		close(nrIn);
 		exit(0);
 	}
 	else {
 		y = fork(); // FILHO que le do pipe sem nome PF, executa o comando e escreve no pipe sem nome FP
-		if(y==0){ 
+	    if(y==0){ 
 			close(pf[1]);
 			close(fp[0]);
 
-			argumentos[0]=comando;
+			strcpy(argumentos[0],comando);
 			
 			for(i=1; i<qtArg+1; i++){
-				argumentos[i]=arg[i-1];
+				strcpy(argumentos[i],arg[i-1]);
 			}
 
 			argumentos[qtArg+1]=NULL;
@@ -127,7 +127,6 @@ int node(int id, char* cmd, char** arg, int qtArg){
 				}
 
 				close(fp[0]);
-				close(nrOut);
 				exit(0);
 			}
 			else {
@@ -141,11 +140,10 @@ int node(int id, char* cmd, char** arg, int qtArg){
 		}
 	}
 
-	free(argumentos);
-
 	return 0;
 }
 
+/*
 int main(int argc, char** argv){
 
 	if(argc<4){
@@ -165,4 +163,4 @@ int main(int argc, char** argv){
 	free(argumentos);
 
 	return 0;
-}
+}*/

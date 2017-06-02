@@ -9,12 +9,12 @@
 #include <stdio.h>
 
 int myWindow(char* buf, int qt, char** arrayLinhas, int linhas, int linhasAntigas, char* coluna, char* operador){
-    int l, i, j, tmp;
+    int l, i;
     int elemInt[linhas-1]; //-1 porque a primeira linha nao é necessaria para os calculos
     char* elem[linhas-1];
 
 	int soma, max, min;
-	float media;
+	int media;
     char str[PIPE_BUF];
    	int qtConst;
 
@@ -48,8 +48,8 @@ int myWindow(char* buf, int qt, char** arrayLinhas, int linhas, int linhasAntiga
 
     if((strcmp(operador, "avg")) == 0){
         if(soma==0) media = soma;
-        else media = soma/linhasAntigas;
-        sprintf(str, "%f", media);
+        else media = (int) soma/linhasAntigas;
+        sprintf(str, "%d", media);
         qtConst = addFimLinha(buf, qt, str);
    		return qtConst;
     }
